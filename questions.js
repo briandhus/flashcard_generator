@@ -1,0 +1,30 @@
+exports.questions = [
+	{
+		full:
+		cloze:
+	},
+	{
+		full:
+		cloze:
+	},
+	{
+		full:
+		cloze:
+	},
+	{
+		full:
+		cloze:
+	},
+	{
+		full:
+		cloze:
+	},
+	{
+		full:
+		cloze:
+	},
+	{
+		full:
+		cloze:
+	}
+]
