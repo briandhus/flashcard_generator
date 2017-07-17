@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/briandhus/flashcard_generator#readme",
   "dependencies": {
-    "inquirer": "^3.2.0"
+    "inquirer": "^3.2.0",
+    "jsonfile": "^3.0.1"
   }
 }
