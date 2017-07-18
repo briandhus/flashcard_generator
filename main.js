@@ -3,7 +3,7 @@ var fs = require('fs');
 var inquirer = require('inquirer');
 var BasicCard = require('./basicCard.js');
 var ClozeCard = require('./clozeCard.js');
-var jsonFile = require('jsonfile');
+var jsonfile = require('jsonfile');
 
 // variables to hold basic and cloze info
 var basicArray = [];
@@ -15,6 +15,7 @@ var question = 0;
 var correct = 0;
 // var for answers wrong
 var incorrect = 0;
+
 
 function start () {
 	inquirer.prompt([
@@ -30,10 +31,10 @@ function start () {
 					createType();
 					break;
 				case 'Test myself':
-					testNumber();
+					testType();
 					break;
 				default:
-					console.log('Error, please try again.');
+					console.log('Error, please choose again.');
 					break;
 			}
 		})
@@ -62,7 +63,8 @@ function createBasic () {
 				name: 'front',
 				message: 'Front of card',
 				type: 'input'
-			},{
+			},
+			{
 				name: 'back',
 				message: 'Back of card',
 				type: 'input'
@@ -80,7 +82,7 @@ function createClozeSentence () {
 				type: 'input'
 			}
 		]).then(function(answer) {
-			createClozeAnswer(answer.full);
+			createClozeAnswer(answer.text);
 		});
 }
 //Creates cloze answer, checks to make sure the answer is part of the cloze sentence so it can be replaced
@@ -106,7 +108,7 @@ function createClozeAnswer (sentence) {
 //Takes in args for question and answer and appends the information in the form of a text object to basic file
 function basicCardCreate(front, back) {
 	// console.log(front, back);
-	var basicCard = new Basic(front, back);
+	var basicCard = new BasicCard(front, back);
 
 	basicArray.push(basicCard);
 
@@ -148,7 +150,7 @@ function basicCardCreate(front, back) {
 //takes in args of full question and answer part of sentence, then appends question in form of text object to cloze file 
 function clozeCardCreate(full, answer) {
 	//console.log(full, answer);
-	var clozeCard = new Cloze(full, answer);
+	var clozeCard = new ClozeCard(full, answer);
 
 	clozeArray.push(clozeCard);
 
@@ -184,6 +186,120 @@ function clozeCardCreate(full, answer) {
 		}
 	});
 }
+//Choose test type
+function testType (count) {
+	inquirer.prompt([
+			{
+				name: 'testType',
+				message: 'Would you like to go through basic or cloze flashcards?',
+				choices: ['Cloze', 'Basic'],
+				type: 'list'
+			},
+		]).then(function(answer) {
+			if(answer.testType === 'Basic') {
+				basicTest(count);
+			} else {
+				clozeTest(count);
+			}
+		});
+};
+//Runs basic test
+function basicTest (count) {
+	console.log("hello");	
+	jsonfile.readFile('basicCard.json', function(err, data) {
+		if (count > data.length) {
+			count = data.length;
+		}
+		
+		var correct = 0;
+		var total = count;
+		var testArray = data;
+		var basic;
+
+		function basicLoop() {
+			if(count > 0) {			
+				var num = Math.floor(Math.random() * testArray.length);
+				basic = new BasicCard(testArray[num].front, testArray[num].back);
+				inquirer.prompt([
+						{
+							name: 'response',
+							message: basic.front,
+							type: 'input'
+						}
+					]).then(function(answer) {
+						if(answer.response === basic.back) {
+							console.log("Correct answer!");
+							console.log("====================================================");
+							correct++;
+						}else{
+							console.log("Sorry, incorrect. The correct answer was " + basic.back);
+							console.log("=====================================================");
+						}
+						testArray.splice(num, 1);
+						count--;	
+						basicLoop();
+					});
+			} else {
+				calculateScore(correct, total);
+			}
+		}
+		basicLoop();
+	});
+};
+//Runs cloze deletion test
+function clozeTest(count) {
+	jsonfile.readFile('clozeCard.json', function(err, data) {
+		if(count > data.length) {
+			count = data.length;
+		}
+
+		var correct = 0;
+		var total = count;
+		var testArray = data;
+		var cloze;
+
+		function clozeLoop() {
+			if(count > 0) {
+				var num = Math.floor(Math.random() * testArray.length);
+				var cloze = new ClozeCard(testArray[num].full, testArray[num].answer);
+				var message = cloze.clozeSentence;
+				inquirer.prompt([
+						{
+							name: 'response',
+							message: message,
+							type: 'input'
+						}
+					]).then(function(answer) {
+						if(answer.response === cloze.answer) {
+							console.log("Correct!");
+							console.log(cloze.full);
+							console.log("====================================");
+							correct++;
+						} else {
+							console.log("Sorry, incorrect.");
+							console.log(cloze.full);
+							console.log("====================================");
+						}
+						testArray.splice(num, 1);
+						count--;
+						clozeLoop();
+					});
+			} else {
+				calculateScore(correct, total);
+			}
+		}
+		clozeLoop();
+	});
+};
+//Calculates score
+function calculateScore(correct, total) {
+	var score = correct / total;
+	console.log("You scored a " + score.toFixed(2));
+	console.log("========================================");
+	start();
+};
+
+start();
 
 
 
