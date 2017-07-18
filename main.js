@@ -4,6 +4,7 @@ var inquirer = require('inquirer');
 var BasicCard = require('./basicCard.js');
 var ClozeCard = require('./clozeCard.js');
 var jsonfile = require('jsonfile');
+// var file = '/tmp/data.json';
 
 // variables to hold basic and cloze info
 var basicArray = [];
@@ -197,6 +198,7 @@ function testType (count) {
 			},
 		]).then(function(answer) {
 			if(answer.testType === 'Basic') {
+				// console.log("hello");
 				basicTest(count);
 			} else {
 				clozeTest(count);
@@ -205,8 +207,8 @@ function testType (count) {
 };
 //Runs basic test
 function basicTest (count) {
-	console.log("hello");	
 	jsonfile.readFile('basicCard.json', function(err, data) {
+		console.dir(data);
 		if (count > data.length) {
 			count = data.length;
 		}
@@ -249,6 +251,7 @@ function basicTest (count) {
 //Runs cloze deletion test
 function clozeTest(count) {
 	jsonfile.readFile('clozeCard.json', function(err, data) {
+		console.dir(data);
 		if(count > data.length) {
 			count = data.length;
 		}
