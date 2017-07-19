@@ -17,7 +17,6 @@ var correct = 0;
 // var for answers wrong
 var incorrect = 0;
 
-
 function start () {
 	inquirer.prompt([
 		{
@@ -71,7 +70,7 @@ function createBasic () {
 				type: 'input'
 			}
 		]).then(function(answers) {
-			basicCardCreate(answers.front.trim(), answers.back.trim());
+			basicCardCreate(answers.front.trim().toLowerCase(), answers.back.trim().toLowerCase());
 		});
 }
 //Creates cloze sentence(front of card)
@@ -97,12 +96,12 @@ function createClozeAnswer (sentence) {
 				type: 'input'
 			}
 		]).then(function(answer) {
-			var index = full.indexOf(answer.clozeAnswer.trim());
+			var index = full.indexOf(answer.clozeAnswer.trim().toLowerCase());
 			if(index === -1) {
 				console.log("This text is not part of original sentence. Try again.");
 				createClozeAnswer(sentence);
 			} else {
-				clozeCardCreate(sentence.trim(), answer.clozeAnswer.trim());
+				clozeCardCreate(sentence.trim().toLowerCase(), answer.clozeAnswer.trim().toLowerCase());
 			}
 		});
 }
@@ -208,10 +207,12 @@ function testType (count) {
 //Runs basic test
 function basicTest (count) {
 	jsonfile.readFile('basicCard.json', function(err, data) {
-		console.dir(data);
-		if (count > data.length) {
-			count = data.length;
-		}
+		// console.dir(data);
+		// console.log('data', data.length);
+		// console.log(JSON.parse(data));
+		
+		count = data.length;
+		
 		
 		var correct = 0;
 		var total = count;
@@ -229,7 +230,7 @@ function basicTest (count) {
 							type: 'input'
 						}
 					]).then(function(answer) {
-						if(answer.response === basic.back) {
+						if(answer.response.toLowerCase() === basic.back) {
 							console.log("Correct answer!");
 							console.log("====================================================");
 							correct++;
@@ -251,7 +252,7 @@ function basicTest (count) {
 //Runs cloze deletion test
 function clozeTest(count) {
 	jsonfile.readFile('clozeCard.json', function(err, data) {
-		console.dir(data);
+		// console.dir(data);
 		if(count > data.length) {
 			count = data.length;
 		}
@@ -296,8 +297,13 @@ function clozeTest(count) {
 };
 //Calculates score
 function calculateScore(correct, total) {
-	var score = correct / total;
-	console.log("You scored a " + score.toFixed(2));
+	console.log("correct", correct);
+	console.log("total", total);
+	// total = 5;
+	var score = correct.toString() + '/' + total.toString();
+	console.log("correct1", correct);
+	console.log("total1", total);
+	console.log("You scored a " + score);
 	console.log("========================================");
 	start();
 };
