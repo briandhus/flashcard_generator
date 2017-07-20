@@ -148,9 +148,9 @@ function basicCardCreate(front, back) {
 		});
 }
 //takes in args of full question and answer part of sentence, then appends question in form of text object to cloze file 
-function clozeCardCreate(full, answer) {
+function clozeCardCreate(text, cloze) {
 	//console.log(full, answer);
-	var clozeCard = new ClozeCard(full, answer);
+	var clozeCard = new ClozeCard(text, cloze);
 
 	clozeArray.push(clozeCard);
 
@@ -253,9 +253,8 @@ function basicTest (count) {
 function clozeTest(count) {
 	jsonfile.readFile('clozeCard.json', function(err, data) {
 		// console.dir(data);
-		if(count > data.length) {
-			count = data.length;
-		}
+		
+		count = data.length;
 
 		var correct = 0;
 		var total = count;
@@ -265,8 +264,8 @@ function clozeTest(count) {
 		function clozeLoop() {
 			if(count > 0) {
 				var num = Math.floor(Math.random() * testArray.length);
-				var cloze = new ClozeCard(testArray[num].full, testArray[num].answer);
-				var message = cloze.clozeSentence;
+				var cloze = new ClozeCard(testArray[num].text.toLowerCase(), testArray[num].cloze.toLowerCase());
+				var message = cloze.partialtext;
 				inquirer.prompt([
 						{
 							name: 'response',
@@ -274,14 +273,16 @@ function clozeTest(count) {
 							type: 'input'
 						}
 					]).then(function(answer) {
-						if(answer.response === cloze.answer) {
+						
+						if(answer.response.toLowerCase() === cloze.cloze.toLowerCase()) {
+
 							console.log("Correct!");
-							console.log(cloze.full);
+							console.log(cloze.text);
 							console.log("====================================");
 							correct++;
 						} else {
 							console.log("Sorry, incorrect.");
-							console.log(cloze.full);
+							console.log(cloze.text);
 							console.log("====================================");
 						}
 						testArray.splice(num, 1);
@@ -299,10 +300,8 @@ function clozeTest(count) {
 function calculateScore(correct, total) {
 	console.log("correct", correct);
 	console.log("total", total);
-	// total = 5;
+	
 	var score = correct.toString() + '/' + total.toString();
-	console.log("correct1", correct);
-	console.log("total1", total);
 	console.log("You scored a " + score);
 	console.log("========================================");
 	start();
